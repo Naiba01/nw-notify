@@ -95,18 +95,16 @@ var config = {
     cursor: 'default'
   },
   defaultWindow: {
-    'always-on-top': true,
-    'visible-on-all-workspaces': true,
-    'show_in_taskbar': process.platform == "darwin",
+    'always_on_top': true,
+    'visible_on_all_workspaces': true,
     resizable: false,
     show: false,
     frame: false,
-    transparent: true,
-    toolbar: false
+    transparent: true
   },
   htmlTemplate: '<html>\n'
   + '<head></head>\n'
-  + '<body style="overflow: hidden; -webkit-user-select: none;">\n'
+  + '<body style="margin: 0; overflow: hidden; -webkit-user-select: none;">\n'
   + '<div id="container">\n'
   + ' <img src="" id="appIcon" />\n'
   + ' <img src="" id="image" />\n'
@@ -127,15 +125,7 @@ function setConfig(customConfig) {
 
 // Little helper functions
 function updateAppPath() {
-  // Get url of current page in nwjs
-  var pathToAppIndex = window.location.href
-  // Remove everything after '#'
-  var urlParts = pathToAppIndex.split('#')
-  pathToAppIndex = urlParts[0]
-  var pathSegemnts = pathToAppIndex.split('/')
-  // Remove last part (e.g. index.html of app)
-  pathSegemnts.pop()
-  config.appPath = pathSegemnts.join('/') + '/'
+  config.appPath = process.cwd() + '/';
   return config.appPath
 }
 
@@ -480,7 +470,8 @@ function moveNotificationAnimation(i, done) {
       return done(null, 'done')
     }
     // Move one step down
-    notification.moveTo(config.firstPos.x, startY + curStep * step)
+    var y = parseInt(startY + curStep * step);
+    notification.moveTo(config.firstPos.x, y)
     curStep++
   }, config.animationStepMs)
 }
@@ -512,45 +503,49 @@ function getWindow() {
       var windowProperties = config.defaultWindow
       windowProperties.width = config.width
       windowProperties.height = config.height
-      notificationWindow = gui.Window.open(getTemplatePath(), config.defaultWindow)
+      gui.Window.open(getTemplatePath(), config.defaultWindow, function (newWindow) {
+        // https://github.com/nwjs/nw.js/issues/4898
+        newWindow.setShowInTaskbar(false)
+        notificationWindow = newWindow;
+        // Return once DOM is loaded
+        notificationWindow.on('loaded', function () {
+          // Style it
+          var notiDoc = notificationWindow.window.document
+          var container = notiDoc.getElementById('container')
+          var appIcon = notiDoc.getElementById('appIcon')
+          var image = notiDoc.getElementById('image')
+          var close = notiDoc.getElementById('close')
+          var message = notiDoc.getElementById('message')
+          // Default style
+          setStyleOnDomElement(config.defaultStyleContainer, container)
+          // Size and radius
+          var style = {
+            height: config.height - 2 * config.borderRadius - 2 * config.defaultStyleContainer.padding,
+            width: config.width - 2 * config.borderRadius - 2 * config.defaultStyleContainer.padding,
+            borderRadius: config.borderRadius + 'px'
+          }
+          setStyleOnDomElement(style, container)
+          // Style appIcon or hide
+          if (config.appIcon) {
+            setStyleOnDomElement(config.defaultStyleAppIcon, appIcon)
+            appIcon.src = config.appIcon
+          }
+          else {
+            setStyleOnDomElement({
+              display: 'none'
+            }, appIcon)
+          }
+          // Style image
+          setStyleOnDomElement(config.defaultStyleImage, image)
+          // Style close button
+          setStyleOnDomElement(config.defaultStyleClose, close)
+          // Remove margin from text p
+          setStyleOnDomElement(config.defaultStyleText, message)
+          // Done
+          resolve(notificationWindow)
+        })
+      })
     }
-    // Return once DOM is loaded
-    notificationWindow.on('loaded', function() {
-      // Style it
-      var notiDoc = notificationWindow.window.document
-      var container = notiDoc.getElementById('container')
-      var appIcon = notiDoc.getElementById('appIcon')
-      var image = notiDoc.getElementById('image')
-      var close = notiDoc.getElementById('close')
-      var message = notiDoc.getElementById('message')
-      // Default style
-      setStyleOnDomElement(config.defaultStyleContainer, container)
-      // Size and radius
-      var style = {
-        height: config.height - 2*config.borderRadius - 2*config.defaultStyleContainer.padding,
-        width: config.width - 2*config.borderRadius  - 2*config.defaultStyleContainer.padding,
-        borderRadius: config.borderRadius + 'px'
-      }
-      setStyleOnDomElement(style, container)
-      // Style appIcon or hide
-      if (config.appIcon) {
-        setStyleOnDomElement(config.defaultStyleAppIcon, appIcon)
-        appIcon.src = config.appIcon
-      }
-      else {
-        setStyleOnDomElement({
-          display: 'none'
-        }, appIcon)
-      }
-      // Style image
-      setStyleOnDomElement(config.defaultStyleImage, image)
-      // Style close button
-      setStyleOnDomElement(config.defaultStyleClose, close)
-      // Remove margin from text p
-      setStyleOnDomElement(config.defaultStyleText, message)
-      // Done
-      resolve(notificationWindow)
-    })
   })
 }
 
