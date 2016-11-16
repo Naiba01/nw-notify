@@ -589,16 +589,6 @@ function log(){
   }
 }
 
-/**
- * Auto cleanup
- */
-gui.Window.get().on('close', function() {
-  if (config.autoCleanup) {
-    closeAll()
-    gui.App.quit()
-  }
-})
-
 module.exports.notify = notify
 module.exports.setConfig = setConfig
 module.exports.getAppPath = getAppPath
