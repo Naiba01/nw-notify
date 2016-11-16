@@ -94,6 +94,11 @@ var config = {
     overflow: 'hidden',
     cursor: 'default'
   },
+  defaultStyleTitle: {
+    fontSize: 16,
+    color: '#333',
+    lineHeight: '24px'
+  },
   defaultWindow: {
     'always_on_top': true,
     'visible_on_all_workspaces': true,
@@ -516,6 +521,7 @@ function getWindow() {
           var image = notiDoc.getElementById('image')
           var close = notiDoc.getElementById('close')
           var message = notiDoc.getElementById('message')
+          var title = notiDoc.getElementById('title')
           // Default style
           setStyleOnDomElement(config.defaultStyleContainer, container)
           // Size and radius
@@ -541,6 +547,8 @@ function getWindow() {
           setStyleOnDomElement(config.defaultStyleClose, close)
           // Remove margin from text p
           setStyleOnDomElement(config.defaultStyleText, message)
+          // Set title's css style
+          setStyleOnDomElement(config.defaultStyleTitle, title)
           // Done
           resolve(notificationWindow)
         })
