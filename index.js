@@ -89,10 +89,16 @@ var config = {
     fontSize: 11,
     color: '#CCC'
   },
-  defaultStyleText: {
+  defaultStyleMessage: {
     margin: 0,
     overflow: 'hidden',
     cursor: 'default'
+  },
+  defaultStyleText: {
+    display: 'flex',
+    height: '100%',
+    flexDirection: 'column',
+    justifyContent: 'center'
   },
   defaultStyleTitle: {
     fontSize: 16,
@@ -521,6 +527,7 @@ function getWindow() {
           var image = notiDoc.getElementById('image')
           var close = notiDoc.getElementById('close')
           var message = notiDoc.getElementById('message')
+          var text = notiDoc.getElementById('text')
           var title = notiDoc.getElementById('title')
           // Default style
           setStyleOnDomElement(config.defaultStyleContainer, container)
@@ -546,7 +553,9 @@ function getWindow() {
           // Style close button
           setStyleOnDomElement(config.defaultStyleClose, close)
           // Remove margin from text p
-          setStyleOnDomElement(config.defaultStyleText, message)
+          setStyleOnDomElement(config.defaultStyleText, text)
+          // Remove margin from message p
+          setStyleOnDomElement(config.defaultStyleMessage, message)
           // Set title's css style
           setStyleOnDomElement(config.defaultStyleTitle, title)
           // Done
@@ -589,9 +598,11 @@ function log(){
   }
 }
 
+
 module.exports.notify = notify
 module.exports.setConfig = setConfig
 module.exports.getAppPath = getAppPath
 module.exports.getTemplatePath = getTemplatePath
 module.exports.setTemplatePath = setTemplatePath
 module.exports.closeAll = closeAll
+
