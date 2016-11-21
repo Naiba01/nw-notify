@@ -123,7 +123,7 @@ var config = {
   + '   <b id="title"></b>\n'
   + '   <p id="message"></p>\n'
   + ' </div>\n'
-  + ' <div id="close">X</div>\n'
+  + ' <div id="close">x</div>\n'
   + '</div>\n'
   + '</body>\n'
   + '</html>'
